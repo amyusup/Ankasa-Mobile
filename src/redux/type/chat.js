@@ -1,0 +1,1 @@
+export const GET_LAST_MESSAGE = 'GET_LAST_MESSAGE';
