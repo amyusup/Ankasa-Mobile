@@ -21,7 +21,7 @@ import BottomSheet from 'reanimated-bottom-sheet';
 import Animated from 'react-native-reanimated';
 import {imageURI} from '../utils';
 import ImagePicker from 'react-native-image-picker';
-
+import {LoginManager} from 'react-native-fbsdk';
 const Profile = ({navigation}) => {
   const {data} = useSelector((state) => state.user);
   const {isLogin, token} = useSelector((state) => state.auth);
@@ -32,13 +32,19 @@ const Profile = ({navigation}) => {
   const [avatarSource, setAvatarSource] = React.useState(null);
   const [uploadData, setUploadData] = React.useState(null);
 
+  logoutWithFacebook = () => {
+    LoginManager.logOut();
+    // this.setState({userInfo: {}});
+    // setUserInfo({});
+  };
+
   const showModal = () => SetVisible(true);
   const hideModal = () => SetVisible(false);
 
   const uploadPhoto = () => {
     dispatch(editUser(uploadData, token));
     hideModal();
-    bs.current.snapTo(1)
+    bs.current.snapTo(1);
   };
 
   const takePhotoFromCamera = () => {
@@ -56,14 +62,14 @@ const Profile = ({navigation}) => {
         });
         // dispatch(editUser(formData, token))
         if (response.didCancel) {
-            console.log('User cancelled image picker');
-          } else if (response.error) {
-            console.log('Image Picker Error: ', response.error);
-          } else {
-            setAvatarSource({uri: response.uri});
-            setUploadData(formData);
-            showModal();
-          }
+          console.log('User cancelled image picker');
+        } else if (response.error) {
+          console.log('Image Picker Error: ', response.error);
+        } else {
+          setAvatarSource({uri: response.uri});
+          setUploadData(formData);
+          showModal();
+        }
       },
     );
   };
@@ -136,17 +142,15 @@ const Profile = ({navigation}) => {
         <StatusBar backgroundColor="#FFFFFF" barStyle="dark-content" />
         <ScrollView style={{backgroundColor: 'white', height: '100%'}}>
           <View style={{paddingBottom: 30}}>
-
             <View
               style={{
                 paddingVertical: 30,
                 marginLeft: 20,
-                marginRight: 20,}}>
-
+                marginRight: 20,
+              }}>
               <Text style={{fontSize: 40, fontWeight: 'bold'}}>Profile</Text>
 
               <View style={{marginVertical: '50%'}}>
-
                 <Button
                   onPress={() => navigation.navigate('SignUp')}
                   style={{
@@ -154,7 +158,7 @@ const Profile = ({navigation}) => {
                     backgroundColor: '#2395FF',
                     borderRadius: 10,
                     height: 60,
-                    elevation: 5
+                    elevation: 5,
                   }}>
                   <Text style={{color: 'white', margin: '40%'}}>
                     Create My Account
@@ -169,14 +173,12 @@ const Profile = ({navigation}) => {
                     height: 60,
                     marginTop: 20,
                     marginBottom: 20,
-                    borderWidth: 1
+                    borderWidth: 1,
                   }}>
                   <Text style={{color: '#2395FF', margin: '50%'}}>Sign In</Text>
                 </Button>
               </View>
-
             </View>
-            
           </View>
         </ScrollView>
       </>

@@ -28,6 +28,7 @@
     "react": "16.13.1",
     "react-native": "0.63.3",
     "react-native-dropdown-autocomplete-textinput": "^1.0.1",
+    "react-native-fbsdk": "^3.0.0",
     "react-native-fingerprint-scanner": "^6.0.0",
     "react-native-gesture-handler": "^1.9.0",
     "react-native-global-props": "^1.1.5",

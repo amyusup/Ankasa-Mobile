@@ -38,7 +38,7 @@ export const signup = (data) => async (dispatch) => {
   dispatch(registerRequest());
   try {
     const res = await Axios.post(`${URI}/auth/register`, data);
-    dispatch(registerSuccess(res.data.message));
+    dispatch(registerSuccess(res.data));
   } catch (error) {
     ToastAndroid.show(error.response.data.data.message, ToastAndroid.SHORT);
     console.log(error.response.data.data.message)

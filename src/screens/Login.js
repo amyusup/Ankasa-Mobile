@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {login} from '../redux/actions/login';
+import {signup} from '../redux/actions/register';
 import Back from '../assets/icons/btnback.svg';
 import Input from '../components/input';
 import {RectButton, TouchableOpacity} from 'react-native-gesture-handler';
@@ -22,17 +23,94 @@ import Eye from '../assets/icons/view 1.svg';
 import {URI} from '../utils';
 import {WebView} from 'react-native-webview';
 
+import {
+  AccessToken,
+  GraphRequest,
+  GraphRequestManager,
+  LoginManager,
+} from 'react-native-fbsdk';
+
 const Login = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [userInfo, setUserInfo] = useState({});
   const [eye, setEye] = useState(true);
   const {device_token, error} = useSelector((state) => state.auth);
+  const register = useSelector((state) => state.register);
   const dispatch = useDispatch();
 
   const onSubmit = () => {
     if (email && password && device_token) {
       dispatch(login({email, password, device_token}));
     }
+  };
+
+  logoutWithFacebook = () => {
+    LoginManager.logOut();
+    // this.setState({userInfo: {}});
+    setUserInfo({});
+  };
+
+  getInfoFromToken =  (token) => {
+    const PROFILE_REQUEST_PARAMS = {
+      fields: {
+        // string: 'id,name,first_name,last_name',
+        string: 'id,name,email',
+      },
+    };
+    const profileRequest =  new GraphRequest(
+      '/me',
+      {token, parameters: PROFILE_REQUEST_PARAMS},
+      async (error, user) => {
+        if (error) {
+          console.log('login info has error: ' + error);
+        } else {
+          // this.setState({userInfo: user});
+          setUserInfo({
+            name: user.name,
+            email: `${user.id}@gmail.com`,
+            password: `${user.id}`,
+          });
+          console.log(userInfo);
+          
+            await dispatch(signup({
+              name: user.name,
+            email: `${user.id}@gmail.com`,
+            password: `${user.id}`,
+            }));
+            console.log('aaaaaaaaaaaaaa lanjut')
+             dispatch(login({ email: user.id + '@gmail.com', password: user.id, device_token}));
+         
+          // console.log(register.error)
+          // if(register.message.response.status == 403){
+           
+          //   console.log('masuk login')
+          // }else{
+          //   console.log('gamasuk login')
+          // }
+        }
+      },
+    );
+    new GraphRequestManager().addRequest(profileRequest).start();
+  };
+
+  loginWithFacebook = () => {
+    // Attempt a login using the Facebook login dialog asking for default permissions.
+    LoginManager.logInWithPermissions(['public_profile']).then(
+      (login) => {
+        if (login.isCancelled) {
+          console.log('Login cancelled');
+        } else {
+          AccessToken.getCurrentAccessToken().then((data) => {
+            const accessToken = data.accessToken.toString();
+            getInfoFromToken(accessToken);
+          });
+        }
+      },
+      (error) => {
+        console.log('Login fail with error: ' + error);
+      },
+    );
   };
 
   useEffect(() => {
@@ -140,7 +218,8 @@ const Login = ({navigation}) => {
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() =>
-                      Linking.openURL('http://192.168.1.4/facebook')
+                      // Linking.openURL('http://192.168.1.4/facebook')
+                      loginWithFacebook()
                     }
                     style={styles.logo}>
                     <FacebookIcon width={24} height={24} />
