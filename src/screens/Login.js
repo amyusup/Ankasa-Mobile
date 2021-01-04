@@ -30,6 +30,12 @@ import {
   LoginManager,
 } from 'react-native-fbsdk';
 
+import {
+  GoogleSignin,
+  GoogleSigninButton,
+  statusCodes,
+} from '@react-native-community/google-signin';
+
 const Login = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -51,14 +57,14 @@ const Login = ({navigation}) => {
     setUserInfo({});
   };
 
-  getInfoFromToken =  (token) => {
+  getInfoFromToken = (token) => {
     const PROFILE_REQUEST_PARAMS = {
       fields: {
         // string: 'id,name,first_name,last_name',
         string: 'id,name,email',
       },
     };
-    const profileRequest =  new GraphRequest(
+    const profileRequest = new GraphRequest(
       '/me',
       {token, parameters: PROFILE_REQUEST_PARAMS},
       async (error, user) => {
@@ -68,22 +74,30 @@ const Login = ({navigation}) => {
           // this.setState({userInfo: user});
           setUserInfo({
             name: user.name,
-            email: `${user.id}@gmail.com`,
+            email: `${user.id}@facebook.com`,
             password: `${user.id}`,
           });
-          console.log(userInfo);
-          
-            await dispatch(signup({
+          // console.log(user);
+
+          await dispatch(
+            signup({
               name: user.name,
-            email: `${user.id}@gmail.com`,
-            password: `${user.id}`,
-            }));
-            console.log('aaaaaaaaaaaaaa lanjut')
-             dispatch(login({ email: user.id + '@gmail.com', password: user.id, device_token}));
-         
+              email: `${user.id}@facebook.com`,
+              password: `${user.id}`,
+            }),
+          );
+          // console.log('aaaaaaaaaaaaaa lanjut');
+          dispatch(
+            login({
+              email: user.id + '@facebook.com',
+              password: user.id,
+              device_token,
+            }),
+          );
+
           // console.log(register.error)
           // if(register.message.response.status == 403){
-           
+
           //   console.log('masuk login')
           // }else{
           //   console.log('gamasuk login')
@@ -113,10 +127,87 @@ const Login = ({navigation}) => {
     );
   };
 
+  const loginWithGoogle = async () => {
+    try {
+      await GoogleSignin.hasPlayServices();
+      const userGoogle = await GoogleSignin.signIn();
+      // console.log(userGoogle);
+      setUserInfo(userGoogle);
+      await dispatch(
+        signup({
+          name: userGoogle.user.name,
+          email: userGoogle.user.email,
+          password: userGoogle.user.id,
+        }),
+      );
+      // console.log('aaaaaaaaaaaaaa lanjut');
+      dispatch(
+        login({
+          email: userGoogle.user.email,
+          password: userGoogle.user.id,
+          device_token,
+        }),
+      );
+    } catch (error) {
+      console.log('Message', error.message);
+      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+        console.log('User Cancelled the Login Flow');
+      } else if (error.code === statusCodes.IN_PROGRESS) {
+        console.log('Signing In');
+      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        console.log('Play Services Not Available or Outdated');
+      } else {
+        console.log('Some Other Error Happened');
+      }
+    }
+  };
+
+  const isSignedIn = async () => {
+    const isSignedIn = await GoogleSignin.isSignedIn();
+    if (!!isSignedIn) {
+      getCurrentUserInfo();
+    } else {
+      console.log('Please Login');
+    }
+  };
+
+  const getCurrentUserInfo = async () => {
+    try {
+      const userGoogle = await GoogleSignin.signInSilently();
+      setUserInfo(userGoogle);
+    
+    } catch (error) {
+      if (error.code === statusCodes.SIGN_IN_REQUIRED) {
+        alert('User has not signed in yet');
+        console.log('User has not signed in yet');
+      } else {
+        alert("Something went wrong. Unable to get user's info");
+        console.log("Something went wrong. Unable to get user's info");
+      }
+    }
+  };
+
+  const logoutWithGoogle = async () => {
+    try {
+      await GoogleSignin.revokeAccess();
+      await GoogleSignin.signOut();
+      setUserInfo({}); // Remember to remove the user from your app's state as well
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
     if (error) {
       ToastAndroid.show(error, ToastAndroid.SHORT);
     }
+    GoogleSignin.configure({
+      webClientId: '',
+      offlineAccess: false, // if you want to access Google API on behalf of the user FROM YOUR SERVER
+      forceCodeForRefreshToken: true, // [Android] related to `serverAuthCode`, read the docs link below *.
+      iosClientId: '', // [iOS] optional, if you want to specify the client ID of type iOS (otherwise, it is taken from GoogleService-Info.plist)
+    });
+    isSignedIn();
   }, [dispatch, error]);
 
   return (
@@ -212,10 +303,11 @@ const Login = ({navigation}) => {
                   }}></View>
                 <Text style={{textAlign: 'center'}}>or sign in with</Text>
                 <View style={styles.containerLogo}>
-                  <TouchableOpacity style={styles.logo}>
+                  <TouchableOpacity style={styles.logo} onPress={loginWithGoogle}>
                     {/* <WebView source={{uri: 'http://192.168.1.4:8000/google'}} /> */}
                     <GoogleIcon width={24} height={24} />
                   </TouchableOpacity>
+                 
                   <TouchableOpacity
                     onPress={() =>
                       // Linking.openURL('http://192.168.1.4/facebook')

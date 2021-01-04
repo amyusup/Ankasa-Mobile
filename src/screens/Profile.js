@@ -22,6 +22,8 @@ import Animated from 'react-native-reanimated';
 import {imageURI} from '../utils';
 import ImagePicker from 'react-native-image-picker';
 import {LoginManager} from 'react-native-fbsdk';
+import {GoogleSignin} from '@react-native-community/google-signin';
+
 const Profile = ({navigation}) => {
   const {data} = useSelector((state) => state.user);
   const {isLogin, token} = useSelector((state) => state.auth);
@@ -36,6 +38,16 @@ const Profile = ({navigation}) => {
     LoginManager.logOut();
     // this.setState({userInfo: {}});
     // setUserInfo({});
+  };
+
+  const logoutWithGoogle = async () => {
+    try {
+      await GoogleSignin.revokeAccess();
+      await GoogleSignin.signOut();
+      // setUserInfo({}); // Remember to remove the user from your app's state as well
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const showModal = () => SetVisible(true);
@@ -386,6 +398,8 @@ const Profile = ({navigation}) => {
                   onPress={() => {
                     dispatch(userLogout());
                     dispatch(logout());
+                    logoutWithGoogle()
+                    logoutWithFacebook()
                   }}
                   style={{flexDirection: 'row', paddingTop: 20}}>
                   <Logout width={24} height={24} />
