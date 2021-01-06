@@ -3,11 +3,22 @@ import {View, Text, TextInput, StyleSheet} from 'react-native';
 import {RectButton, TouchableOpacity} from 'react-native-gesture-handler';
 import style from '../helpers';
 import Back from '../assets/icons/btnback.svg';
-import { useDispatch } from 'react-redux';
+import { sendingEmail } from '../redux/actions/forgot';
+import { useDispatch, useSelector } from 'react-redux';
 
 const Forgot = ({navigation}) => {
+  const [email, setEmail] = React.useState('')
+  const dispatch = useDispatch()
+  const { verificationCode } = useSelector((state)=>state.forgot)
+  React.useEffect(()=>{
+    if(verificationCode){
+      navigation.navigate('Reset')
+    }
+  },[verificationCode])
+
   const onSubmit = () => {
-    navigation.navigate('Reset')
+    // navigation.navigate('Reset')
+    dispatch(sendingEmail({mailTo:email}));
   }
 
   return (
@@ -25,15 +36,17 @@ const Forgot = ({navigation}) => {
             style={{marginTop: 30}}
             placeholder="Email"
             underlineColorAndroid="#9B96AB"
+            onChangeText={(text)=>setEmail(text)}
           />
         </View>
 
         <View style={{marginTop: 20}}>
-          <RectButton onPress={onSubmit} style={styles.button}>
+          <RectButton onPress={onSubmit} style={email.length < 1 ?styles.buttonDisabled
+                      : styles.button} enabled={email.length < 1 ? false:true}>
             <Text
               style={{
                 textAlign: 'center',
-                color: style.white,
+                color:email.length < 1 ?style.dark:style.white,
                 fontSize: 18,
                 fontWeight: 'bold',
               }}>
@@ -61,6 +74,13 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: style.primary,
+    borderRadius: 10,
+    paddingVertical: 15,
+    elevation: 2,
+    marginBottom: 10,
+  },
+  buttonDisabled: {
+    backgroundColor: style.grey,
     borderRadius: 10,
     paddingVertical: 15,
     elevation: 2,

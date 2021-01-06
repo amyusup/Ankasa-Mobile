@@ -1,11 +1,23 @@
 import Axios from 'axios'
 import { URI } from '../../utils'
-import { EMAIL_FILLED, RESET_FAILED, RESET_REQUEST, RESET_SUCCESS, EMAIL_CHECK } from '../type/forgot'
+import { RESET_FAILED, RESET_REQUEST, RESET_SUCCESS, SEND_EMAIL_REQUEST, SEND_EMAIL_RESPONSE, CLEAR_FORGOT } from '../type/forgot'
+import { ToastAndroid } from 'react-native'
 
-export const emailFilled = email => {
+export const clearForgotRequest = () => {
     return {
-        type: EMAIL_FILLED,
-        payload: email
+        type: CLEAR_FORGOT
+    }
+}
+export const sendingEmailRequest = () => {
+    return {
+        type: SEND_EMAIL_REQUEST
+    }
+}
+
+export const sendingEmailResponse = data => {
+    return {
+        type: SEND_EMAIL_RESPONSE,
+        payload: data
     }
 }
 
@@ -34,13 +46,25 @@ export const reset = data => async dispatch => {
     try {
         const res = await Axios.patch(`${URI}/auth/forgot`, data)
         dispatch(resetSuccess(res.data))
+        ToastAndroid.show("Password has been changed", ToastAndroid.SHORT);
     } catch (error) {
         dispatch(resetFailed(error.message))
+        ToastAndroid.show("Email is not registered", ToastAndroid.SHORT);
     }
 }
 
-export const checkEmail = email => async dispatch => {
-    const res = await Axios.post(`${URI}/auth/check`, { email })
+export const sendingEmail = email => async dispatch => {
+    // const res = await Axios.post(`${URI}/auth/check`, { email })
+    dispatch(sendingEmailRequest())
+    try{
+        const res = await Axios.post(`${URI}/auth/sendEmail`,  email )
+        dispatch(sendingEmailResponse(res.data.data))
+    }catch(error){
+        dispatch(sendingEmailResponse(error))
+        ToastAndroid.show("Email not found", ToastAndroid.SHORT);
+    }
     
-    dispatch({ type: EMAIL_CHECK, payload: res.data.data.message})
+}
+export const clearForgot = () => async dispatch => {
+    dispatch(clearForgotRequest())
 }
