@@ -31,7 +31,7 @@ const BookingDetail = ({navigation}) => {
         <SafeAreaView style={{paddingHorizontal: 10, paddingTop: 40, backgroundColor: "#2395FF"}}>
 
         <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-            <TouchableOpacity flex={1} onPress={() => navigation.goBack()}>
+            <TouchableOpacity flex={1} onPress={() => navigation.navigate('MyBooking')}>
                 <Back width={29} height={29} />
             </TouchableOpacity>
             <Text style={{color: 'white', fontWeight: 'bold', fontSize: 24, paddingRight: 130, top: 3}}>Booking Pass</Text>

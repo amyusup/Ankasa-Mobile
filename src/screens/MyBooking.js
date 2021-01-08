@@ -36,6 +36,7 @@ const MyBooking = ({navigation}) => {
   const [visible, setVisible] = useState(false);
   const [visiblePay, setVisiblePay] = useState(false);
   const {isLogin, token} = useSelector((state) => state.auth);
+  // const {dataBooking, pay} = useSelector((state) => state.booking);
   const {dataBooking, pay} = useSelector((state) => state.booking);
   const {data} = useSelector((state) => state.user);
   const [copiedText, setCopiedText] = useState('');
@@ -44,9 +45,9 @@ const MyBooking = ({navigation}) => {
     if (isLogin) {
       dispatch(getBooking(token));
     }
-  }, []);
+  }, [pay]);
 
-  const onClick = (id, isPaid, fee) => {
+  const onClick =  (id, isPaid, fee) => {
     if (isPaid) {
       dispatch(getBookingById(id, token));
       navigation.navigate('BookingDetail');
@@ -54,6 +55,8 @@ const MyBooking = ({navigation}) => {
       dispatch(payBooking(fee, id, token));
       // console.log(pay, 'booking detail')
       navigation.navigate('BookingPay', {id:id, token:token});
+      // Linking.openURL(pay.redirect_url)
+      // console.log(pay)
       setVisible(true);
     }
   };

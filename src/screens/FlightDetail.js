@@ -166,7 +166,7 @@ const FlightDetail = ({ navigation }) => {
             </View>
           </View>
 
-                <View style={{marginBottom: 5, bottom: 70}}>
+                <View style={{marginBottom: 5}}>
                   <View style={{flexDirection: 'row', justifyContent: 'space-around', marginBottom: 10}}>
                       <Text style={{alignSelf: 'center', color: '#6B6B6B'}}>Total you'll pay</Text>
                       <Text style={{ color: '#2395FF', fontWeight: 'bold', fontSize: 25}}>Rp. {data.price * (dataForm.passengger.child + dataForm.passengger.adult)}</Text>
