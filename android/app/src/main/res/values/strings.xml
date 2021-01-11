@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">Ankasa</string>
     <string name="facebook_app_id">1036665706820114</string>
-    <string name="server_client_id">675089908524-4jfbf46ae890cr1j3dgb7kjm3qleflvr.apps.googleusercontent.com</string>
+    <!-- <string name="server_client_id">675089908524-4jfbf46ae890cr1j3dgb7kjm3qleflvr.apps.googleusercontent.com</string> -->
 </resources>

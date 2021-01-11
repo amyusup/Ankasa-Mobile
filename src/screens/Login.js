@@ -150,14 +150,21 @@ const Login = ({navigation}) => {
       );
     } catch (error) {
       console.log('Message', error.message);
+      // alert('Message', error);
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         console.log('User Cancelled the Login Flow');
+        // alert('User Cancelled the Login Flow');
       } else if (error.code === statusCodes.IN_PROGRESS) {
         console.log('Signing In');
+        // alert('Signing In');
       } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
         console.log('Play Services Not Available or Outdated');
+        // alert('Play Services Not Available or Outdated');
       } else {
-        console.log('Some Other Error Happened');
+        // alert(`Some Other Error Happened. Error code : ${error.code} and Status code : ${statusCodes}`);
+        // alert(JSON.stringify(statusCodes))
+        console.log(`error code : ${error.code} error : ${error}`)
+        // alert(`error code : ${error.code} error : ${error}`)
       }
     }
   };
@@ -202,8 +209,8 @@ const Login = ({navigation}) => {
       ToastAndroid.show(error, ToastAndroid.SHORT);
     }
     GoogleSignin.configure({
-      webClientId: '',
-      offlineAccess: false, // if you want to access Google API on behalf of the user FROM YOUR SERVER
+      webClientId: '675089908524-4jfbf46ae890cr1j3dgb7kjm3qleflvr.apps.googleusercontent.com',
+      offlineAccess: true, // if you want to access Google API on behalf of the user FROM YOUR SERVER
       forceCodeForRefreshToken: true, // [Android] related to `serverAuthCode`, read the docs link below *.
       iosClientId: '', // [iOS] optional, if you want to specify the client ID of type iOS (otherwise, it is taken from GoogleService-Info.plist)
     });
